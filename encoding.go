@@ -32,11 +32,8 @@ func wrapEntry(timestamp uint64, hash uint64, key string, entry []byte, buffer *
 func readEntry(data []byte) []byte {
 	length := binary.LittleEndian.Uint16(data[timestampSizeInBytes+hashSizeInBytes:])
 
-	// copy on read
-	dst := make([]byte, len(data)-int(headersSizeInBytes+length))
-	copy(dst, data[headersSizeInBytes+length:])
-
-	return dst
+	// do not copy on read
+	return data[headersSizeInBytes+length:]
 }
 
 func readTimestampFromEntry(data []byte) uint64 {
@@ -46,11 +43,8 @@ func readTimestampFromEntry(data []byte) uint64 {
 func readKeyFromEntry(data []byte) string {
 	length := binary.LittleEndian.Uint16(data[timestampSizeInBytes+hashSizeInBytes:])
 
-	// copy on read
-	dst := make([]byte, length)
-	copy(dst, data[headersSizeInBytes:headersSizeInBytes+length])
-
-	return bytesToString(dst)
+	// do not copy on read
+	return bytesToString(data[headersSizeInBytes:headersSizeInBytes+length])
 }
 
 func readHashFromEntry(data []byte) uint64 {
